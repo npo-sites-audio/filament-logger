@@ -2,26 +2,37 @@
 
 namespace Z3d0X\FilamentLogger\Resources;
 
-use Filament\Forms\Form;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
+use BackedEnum;
 use Filament\Facades\Filament;
+use Filament\Forms\Components\{
+    DatePicker,
+    KeyValue,
+    Textarea,
+    TextInput
+};
+use Filament\Infolists\Components\TextEntry;
 use Filament\Resources\Resource;
-use Filament\Tables\Filters\Filter;
-use Filament\Forms\Components\Group;
-use Filament\Forms\Components\Section;
-use Filament\Forms\Components\KeyValue;
-use Filament\Forms\Components\Textarea;
-use Filament\Tables\Columns\TextColumn;
-use Illuminate\Database\Eloquent\Model;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\DatePicker;
-use Filament\Tables\Filters\SelectFilter;
-use Illuminate\Database\Eloquent\Builder;
-use Filament\Forms\Components\Placeholder;
-use Spatie\Activitylog\Contracts\Activity;
-use Spatie\Activitylog\ActivitylogServiceProvider;
-use Spatie\Activitylog\Models\Activity as ActivityModel;
+use Filament\Schemas\{
+    Components\Group,
+    Components\Section,
+    Schema
+};
+use Filament\Tables\{
+    Columns\TextColumn,
+    Filters\Filter,
+    Filters\SelectFilter,
+    Table
+};
+use Illuminate\Database\Eloquent\{
+    Builder,
+    Model
+};
+use Illuminate\Support\Str;
+use Spatie\Activitylog\{
+    ActivitylogServiceProvider,
+    Contracts\Activity,
+    Models\Activity as ActivityModel
+};
 use Z3d0X\FilamentLogger\Resources\ActivityResource\Pages;
 
 class ActivityResource extends Resource
@@ -29,7 +40,7 @@ class ActivityResource extends Resource
     protected static ?string $label = 'Activity Log';
     protected static ?string $slug = 'activity-logs';
 
-    protected static ?string $navigationIcon = 'heroicon-o-clipboard-list';
+    protected static BackedEnum|string|null $navigationIcon = 'heroicon-o-clipboard-list';
 
 
     public static function getCluster(): ?string
@@ -37,9 +48,9 @@ class ActivityResource extends Resource
         return config('filament-logger.resources.cluster');
     }
 
-    public static function form(Form $form): Form
+    public static function form(Schema $schema): Schema
     {
-        return $form
+        return $schema
             ->schema([
                 Group::make([
                     Section::make([
@@ -68,23 +79,23 @@ class ActivityResource extends Resource
 
                 Group::make([
                     Section::make([
-                        Placeholder::make('log_name')
-                            ->content(function (?Model $record): string {
+                        TextEntry::make('log_name')
+                            ->state(function (?Model $record): string {
                                 /** @var Activity&ActivityModel $record */
                                 return $record->log_name ? ucwords($record->log_name) : '-';
                             })
                             ->label(__('filament-logger::filament-logger.resource.label.type')),
 
-                        Placeholder::make('event')
-                            ->content(function (?Model $record): string {
+                        TextEntry::make('event')
+                            ->state(function (?Model $record): string {
                                 /** @phpstan-ignore-next-line */
                                 return $record?->event ? ucwords($record?->event) : '-';
                             })
                             ->label(__('filament-logger::filament-logger.resource.label.event')),
 
-                        Placeholder::make('created_at')
+                        TextEntry::make('created_at')
                             ->label(__('filament-logger::filament-logger.resource.label.logged_at'))
-                            ->content(function (?Model $record): string {
+                            ->state(function (?Model $record): string {
                                 /** @var Activity&ActivityModel $record */
                                 return $record->created_at ? "{$record->created_at->format(config('filament-logger.datetime_format', 'd/m/Y H:i:s'))}" : '-';
                             }),
@@ -163,7 +174,7 @@ class ActivityResource extends Resource
                     ->sortable(),
             ])
             ->defaultSort('created_at', 'desc')
-            ->bulkActions([])
+            ->toolbarActions([])
             ->filters([
                 SelectFilter::make('log_name')
                     ->label(__('filament-logger::filament-logger.resource.label.type'))
@@ -181,7 +192,7 @@ class ActivityResource extends Resource
 
 						return __('filament-logger::filament-logger.resource.label.old_attributes') . $data['old'];
 					})
-					->form([
+					->schema([
 						TextInput::make('old')
                             ->label(__('filament-logger::filament-logger.resource.label.old'))
                             ->hint(__('filament-logger::filament-logger.resource.label.properties_hint')),
@@ -202,7 +213,7 @@ class ActivityResource extends Resource
 
 						return __('filament-logger::filament-logger.resource.label.new_attributes') . $data['new'];
 					})
-					->form([
+					->schema([
 						TextInput::make('new')
                             ->label(__('filament-logger::filament-logger.resource.label.new'))
                             ->hint(__('filament-logger::filament-logger.resource.label.properties_hint')),
@@ -216,7 +227,7 @@ class ActivityResource extends Resource
 					}),
 
                 Filter::make('created_at')
-                    ->form([
+                    ->schema([
                         DatePicker::make('logged_at')
                             ->label(__('filament-logger::filament-logger.resource.label.logged_at'))
                             ->displayFormat(config('filament-logger.date_format', 'd/m/Y')),
