@@ -1,3 +1,7 @@
+> [!WARNING]
+> This package is no longer maintained.  
+> If you’re interested in taking over maintenance, feel free to fork the repository.
+
 # Activity logger for filament
 
 [![Latest Version on Packagist](https://img.shields.io/packagist/v/z3d0x/filament-logger.svg?style=for-the-badge)](https://packagist.org/packages/z3d0x/filament-logger)
