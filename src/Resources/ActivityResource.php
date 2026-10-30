@@ -186,7 +186,7 @@ class ActivityResource extends Resource
 
                 Filter::make('properties->old')
 					->indicateUsing(function (array $data): ?string {
-						if (!$data['old']) {
+						if (!$data['old'] ?? null) {
 							return null;
 						}
 
@@ -198,7 +198,7 @@ class ActivityResource extends Resource
                             ->hint(__('filament-logger::filament-logger.resource.label.properties_hint')),
 					])
 					->query(function (Builder $query, array $data): Builder {
-						if (!$data['old']) {
+						if (!$data['old'] ?? null) {
 							return $query;
 						}
 
@@ -207,7 +207,7 @@ class ActivityResource extends Resource
 
 				Filter::make('properties->attributes')
 					->indicateUsing(function (array $data): ?string {
-						if (!$data['new']) {
+						if (!$data['new'] ?? null) {
 							return null;
 						}
 
@@ -219,7 +219,7 @@ class ActivityResource extends Resource
                             ->hint(__('filament-logger::filament-logger.resource.label.properties_hint')),
 					])
 					->query(function (Builder $query, array $data): Builder {
-						if (!$data['new']) {
+						if (!$data['new'] ?? null) {
 							return $query;
 						}
 
@@ -235,7 +235,7 @@ class ActivityResource extends Resource
                     ->query(function (Builder $query, array $data): Builder {
                         return $query
                             ->when(
-                                $data['logged_at'],
+                                $data['logged_at'] ?? null,
                                 fn (Builder $query, $date): Builder => $query->whereDate('created_at', $date),
                             );
                     }),
